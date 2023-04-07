@@ -98,13 +98,16 @@ class PlaylistsHandler {
       credentialId,
     );
 
-    const playlist = await this._playlistsService.getSongsFromPlaylist(
+    const playlist = await this._playlistsService.getPlaylistById(
+      playlistId,
+    );
+    const song = await this._playlistsService.getSongsFromPlaylist(
       playlistId,
     );
     return {
       status: 'success',
       data: {
-        playlist,
+        playlist: { ...playlist, songs: song },
       },
     };
   }
