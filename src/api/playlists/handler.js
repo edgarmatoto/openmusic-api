@@ -1,5 +1,4 @@
 const autoBind = require('auto-bind');
-const ClientError = require('../../exceptions/ClientError');
 
 class PlaylistsHandler {
   constructor(playlistsService, songsService, validator) {
@@ -31,7 +30,7 @@ class PlaylistsHandler {
     return response;    
   }
 
-  async getPlaylistsHandler(req, h) {
+  async getPlaylistsHandler(req) {
     const { id: credentialId } = req.auth.credentials;
     const playlists = await this._playlistsService.getPlaylists(credentialId);
     return {
@@ -42,7 +41,7 @@ class PlaylistsHandler {
     };
   }
 
-  async deletePlaylistByIdHandler(req, h) {
+  async deletePlaylistByIdHandler(req) {
     const { playlistId } = req.params;
     const { id: credentialId } = req.auth.credentials;
 
@@ -89,7 +88,7 @@ class PlaylistsHandler {
     return response;
   }
 
-  async getSongsHandler(req, h) {
+  async getSongsHandler(req) {
     const { playlistId } = req.params;
     const { id: credentialId } = req.auth.credentials;
 
@@ -112,7 +111,7 @@ class PlaylistsHandler {
     };
   }
 
-  async deleteSongByIdHandler(req, h) {
+  async deleteSongByIdHandler(req) {
     const { playlistId } = req.params;
     const { songId } = req.payload;
     const { id: credentialId } = req.auth.credentials;
@@ -138,7 +137,7 @@ class PlaylistsHandler {
     };
   }
 
-  async getActivitiesHandler(req, h) {
+  async getActivitiesHandler(req) {
     const { playlistId } = req.params;
     const { id: credentialId } = req.auth.credentials;
 

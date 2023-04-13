@@ -1,5 +1,4 @@
 const autoBind = require('auto-bind');
-const ClientError = require('../../exceptions/ClientError');
 
 class AlbumsHandler {
   constructor(
@@ -34,7 +33,7 @@ class AlbumsHandler {
     return response;
   }
 
-  async getAlbumsHandler(h) {
+  async getAlbumsHandler() {
     const albums = await this._albumsService.getAlbums();
     return {
       status: 'success',
@@ -44,7 +43,7 @@ class AlbumsHandler {
     };
   }
 
-  async getAlbumByIdHandler(request, h) {
+  async getAlbumByIdHandler(request) {
     const { id } = request.params;
     const album = await this._albumsService.getAlbumById(id);
 
@@ -56,7 +55,7 @@ class AlbumsHandler {
     };
   }
 
-  async putAlbumByIdHandler(request, h) {
+  async putAlbumByIdHandler(request) {
     this._albumsValidator.validateAlbumPayload(request.payload);
     const { id } = request.params;
 
@@ -68,7 +67,7 @@ class AlbumsHandler {
     };
   }
 
-  async deleteAlbumByIdHandler(request, h) {
+  async deleteAlbumByIdHandler(request) {
     const { id } = request.params;
     await this._albumsService.deleteAlbumById(id);
     return {
@@ -97,6 +96,44 @@ class AlbumsHandler {
     });
     response.code(201);
     return response;
+  }
+
+  async postLikesAlbumHandler(request, h) {
+    const { id } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    const message = await this._albumsService.likeTheAlbum(id, credentialId);
+    const response = h.response({
+      status: 'success',
+      message,
+    });
+    response.code(201);
+    return response;
+  }
+
+  async getAlbumLikesByIdHandler(request, h) {
+    const { id } = request.params;
+    const { likes, source } = await this._albumsService.getAlbumLikesById(id);
+    const response = h.response({
+      status: 'success',
+      data: {
+        likes,
+      },
+    });
+    response.header('X-Data-Source', source);
+    response.code(200);
+    return response;
+  }
+
+  async deleteLikesAlbumHandler(request) {
+    const { id } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._albumsService.deleteLikesAlbum(id, credentialId);
+    return {
+      status: 'success',
+      message: 'Like berhasil dihapus',
+    };
   }
 }
 
