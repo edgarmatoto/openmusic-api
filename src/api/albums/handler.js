@@ -4,9 +4,11 @@ const ClientError = require('../../exceptions/ClientError');
 class AlbumsHandler {
   constructor(
     albumsService,
+    storageService,
     albumsValidator,
   ) {
     this._albumsService = albumsService;
+    this._storageService = storageService;
     this._albumsValidator = albumsValidator;
 
     autoBind(this);
@@ -45,6 +47,7 @@ class AlbumsHandler {
   async getAlbumByIdHandler(request, h) {
     const { id } = request.params;
     const album = await this._albumsService.getAlbumById(id);
+
     return {
       status: 'success',
       data: {
@@ -72,6 +75,28 @@ class AlbumsHandler {
       status: 'success',
       message: 'Album berhasil dihapus',
     };
+  }
+
+  async postUploadAlbumCoverHandler(request, h) {
+    const { cover } = request.payload;
+    const { id } = request.params;
+    this._albumsValidator.validateImageHeaders(cover.hapi.headers);
+
+    const filename = await this._storageService.writeFile(
+      cover,
+      cover.hapi,
+    );
+
+    const fileLocation = `${process.env.HOST}:${process.env.PORT}/upload/images/${filename}`;
+
+    await this._albumsService.editAlbumCover(fileLocation, id);
+
+    const response = h.response({
+      status: 'success',
+      message: 'Cover album berhasil disimpan',
+    });
+    response.code(201);
+    return response;
   }
 }
 

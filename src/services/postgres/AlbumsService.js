@@ -72,6 +72,21 @@ class AlbumsService {
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
     }
   }
+
+  async editAlbumCover(cover, id) {
+    const query = {
+      text: 'UPDATE albums SET "coverUrl" = $1 WHERE id = $2 RETURNING id',
+      values: [cover, id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError(
+        'Gagal memperbarui cover album. Id tidak ditemukan',
+      );
+    }
+  }
 }
 
 module.exports = AlbumsService;
